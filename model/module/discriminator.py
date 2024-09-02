@@ -51,10 +51,10 @@ class MultiScaleDiscriminator(nn.Module):
         self.downsample = nn.AvgPool2d(3, stride=2, padding=1)
 
     def forward(self, x):
-        #x2 = self.downsample(x)
-        #x4 = self.downsample(x2)
+        x2 = self.downsample(x)
+        x4 = self.downsample(x2)
         out = self.discriminator(x)
-        #out2 = self.discriminator(x2)
-        #out4 = self.discriminator(x4)
-        #return (out,out2,out4)
-        return (out)
+        out2 = self.discriminator(x2)
+        out4 = self.discriminator(x4)
+        return (out,out2,out4)
+        #return (out,out4)

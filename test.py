@@ -62,7 +62,7 @@ def test_jscc():
     discriminator = MultiScaleDiscriminator()
     #channel = AWGNChannel()
     channel = AWGNChannel()
-    ckpt = 'logs/ARQ/AWGN/version_4/checkpoints/epoch=499-step=782000.ckpt'
+    ckpt = 'logs/ARQ/AWGN/version_6/checkpoints/epoch=499-step=782000.ckpt'
     #ckpt = 'logs/ARQ/AWGN/version_0/checkpoints/epoch=999-step=6250000.ckpt'
     
     model = DeepJSCCARQ.load_from_checkpoint(ckpt,
@@ -74,7 +74,7 @@ def test_jscc():
                     lr_scheduler_type = 'step',
                     lr_D = 5e-6,lr_G = 1e-4
                 )    
-    addr = 'res/gan_awgn/version_4'
+    addr = 'res/gan_awgn/version_6'
     if not os.path.exists(addr):
         os.mkdir(addr)
     with open(addr+'/latest.txt', 'w') as f:
