@@ -111,7 +111,7 @@ def train(hparams):
                     loss_module_D=Least_Square_Loss(),loss_module_G=MSEImageLoss(),
                     channel=channel,
                     discriminator= discriminator,#def __init__(self,encoder,decoder,loss_module_D,loss_module_G,channel,discriminator,lr_D,lr_G):
-                    hyperparameter=18,
+                    hyperparameter=25,
                     lr_scheduler_type = 'step',
                     lr_D = 5e-6,lr_G = 5e-5
                 )
