@@ -86,8 +86,8 @@ def train(hparams):
     output: training
     """
     # define the basic parts
-    encoder = Encoder(out_channels=8)# 512(8*8*8)
-    decoder = Decoder(in_channels=8)
+    encoder = Encoder(out_channels=16)# 512(8*8*8)
+    decoder = Decoder(in_channels=16)
     # determine whether to use the ckpt
     if 'awgn' in hparams.channel.lower():
         channel = AWGNChannel()
