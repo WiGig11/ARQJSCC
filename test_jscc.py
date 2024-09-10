@@ -58,11 +58,11 @@ def get_psnr(pre, img):
 
 def test_jscc():
    #model
-    encoder = Encoder(out_channels=8)
-    decoder = Decoder(in_channels=8)
+    encoder = Encoder(out_channels=16)
+    decoder = Decoder(in_channels=16)
     #channel = AWGNChannel()
     channel = RayleighChannel()
-    ckpt = 'logs/JSCC/RAYL/version_0/checkpoints/epoch=999-step=782000.ckpt'
+    ckpt = 'logs/JSCC/RAYL/version_1/checkpoints/epoch=999-step=782000.ckpt'
     model = DeepJSCC.load_from_checkpoint(ckpt,
                     encoder=encoder,decoder=decoder,
                     loss_module_G=MSEImageLoss(),
@@ -70,7 +70,7 @@ def test_jscc():
                     lr_scheduler_type = 'step',
                     lr_G = 1e-4
                 )    
-    addr = 'res/jscc_rayl/version_0'
+    addr = 'res/jscc_rayl/version_1'
     if not os.path.exists(addr):
         os.mkdir(addr)
     with open(addr+'/latest.txt', 'w') as f:
