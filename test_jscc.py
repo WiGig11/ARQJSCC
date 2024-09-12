@@ -62,7 +62,8 @@ def test_jscc():
     decoder = Decoder(in_channels=16)
     #channel = AWGNChannel()
     channel = RayleighChannel()
-    ckpt = 'logs/JSCC/RAYL/version_1/checkpoints/epoch=999-step=782000.ckpt'
+    #ckpt = 'logs/JSCC/RAYL/version_1/checkpoints/epoch=999-step=782000.ckpt'
+    ckpt = 'test.ckpt'
     model = DeepJSCC.load_from_checkpoint(ckpt,
                     encoder=encoder,decoder=decoder,
                     loss_module_G=MSEImageLoss(),
