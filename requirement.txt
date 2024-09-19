@@ -3,3 +3,5 @@ pytorch-lightning==1.7.7
 torch                   1.9.0+cu111
 torchmetrics            0.11.4
 torchvision             0.10.0+cu111
+cuda 12.2
+nvidia-smi         535.183.01
