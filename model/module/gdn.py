@@ -5,13 +5,12 @@ from torch.nn import functional as F
 from torchvision import datasets, transforms
 from torchvision.utils import save_image
 from torch.autograd import Function
-
+import pdb
 
 class LowerBound(Function):
     @staticmethod
     def forward(ctx, inputs, bound):
-        #b = torch.ones(inputs.size(), device=inputs.device)*bound
-        b = torch.ones(inputs.size())*bound
+        b = torch.ones(inputs.size(), device=inputs.device)*bound
         b = b.to(inputs.device)
         ctx.save_for_backward(inputs, b)
         return torch.max(inputs, b)
