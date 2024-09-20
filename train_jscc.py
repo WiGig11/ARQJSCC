@@ -1,5 +1,5 @@
 import os
-os.environ['CUDA_LAUNCH_BLOCKING'] = '0,1'
+os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
 import torch
 import torch.nn as nn
 
@@ -88,6 +88,10 @@ def train(hparams):
     # define the basic parts
     encoder = Encoder(out_channels=hparams.out_channels)# 512(8*8*8)
     decoder = Decoder(in_channels=hparams.in_channels)
+    print("out_channels")
+    print(colored('====>','red')+hparams.out_channels)
+    print("in_channels")
+    print(colored('====>','red')+hparams.in_channels)
     # determine whether to use the ckpt
     if 'awgn' in hparams.channel.lower():
         channel = AWGNChannel()
@@ -169,7 +173,7 @@ def train(hparams):
                         fast_dev_run= fast_dev_run,
                         profiler = profiler,
                         #strategy='ddp_find_unused_parameters_true'
-                        strategy = DDPStrategy(find_unused_parameters=False)
+                        strategy = DDPStrategy(find_unused_parameters=True)
                         )
     else:
         trainer = Trainer(max_epochs = hparams.max_epoches,
@@ -183,7 +187,7 @@ def train(hparams):
                         check_val_every_n_epoch=int(hparams.check_val_every_n_epoch),
                         profiler = profiler,
                         #strategy='ddp_find_unused_parameters_true'
-                        strategy = DDPStrategy(find_unused_parameters=False)
+                        strategy = DDPStrategy(find_unused_parameters=True)
                         )
     # Run learning rate finder
     '''
