@@ -1,5 +1,5 @@
 import os
-os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
+os.environ['CUDA_LAUNCH_BLOCKING'] = '0,1'
 import torch
 import torch.nn as nn
 
@@ -169,7 +169,7 @@ def train(hparams):
                         fast_dev_run= fast_dev_run,
                         profiler = profiler,
                         #strategy='ddp_find_unused_parameters_true'
-                        strategy = DDPStrategy(find_unused_parameters=True)
+                        strategy = DDPStrategy(find_unused_parameters=False)
                         )
     else:
         trainer = Trainer(max_epochs = hparams.max_epoches,
@@ -183,7 +183,7 @@ def train(hparams):
                         check_val_every_n_epoch=int(hparams.check_val_every_n_epoch),
                         profiler = profiler,
                         #strategy='ddp_find_unused_parameters_true'
-                        strategy = DDPStrategy(find_unused_parameters=True)
+                        strategy = DDPStrategy(find_unused_parameters=False)
                         )
     # Run learning rate finder
     '''

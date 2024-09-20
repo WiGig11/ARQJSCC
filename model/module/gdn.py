@@ -10,7 +10,7 @@ import pdb
 class LowerBound(Function):
     @staticmethod
     def forward(ctx, inputs, bound):
-        b = torch.ones(inputs.size(), device=inputs.device)*bound
+        b = torch.ones(inputs.size(),device = inputs.device)*bound
         b = b.to(inputs.device)
         ctx.save_for_backward(inputs, b)
         return torch.max(inputs, b)
