@@ -32,7 +32,7 @@ class GDN(nn.Module):
     """
     def __init__(self,
                 ch,
-                device=torch.device('cuda'),
+                device=torch.device('cuda:1'),
                 inverse=False,
                 beta_min=1e-6,
                 gamma_init=.1,
