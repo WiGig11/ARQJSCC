@@ -89,9 +89,9 @@ def train(hparams):
     encoder = Encoder(out_channels=hparams.out_channels)# 512(8*8*8)
     decoder = Decoder(in_channels=hparams.in_channels)
     print("out_channels")
-    print(colored('====>','red')+hparams.out_channels)
+    print(colored('====>','red')+str(hparams.out_channels))
     print("in_channels")
-    print(colored('====>','red')+hparams.in_channels)
+    print(colored('====>','red')+str(hparams.in_channels))
     # determine whether to use the ckpt
     if 'awgn' in hparams.channel.lower():
         channel = AWGNChannel()
