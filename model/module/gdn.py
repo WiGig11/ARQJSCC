@@ -1,17 +1,12 @@
 import torch
-import torch.utils.data
-from torch import nn, optim
-from torch.nn import functional as F
-from torchvision import datasets, transforms
-from torchvision.utils import save_image
+from torch import nn
 from torch.autograd import Function
-import pdb
 
 class LowerBound(Function):
     @staticmethod
     def forward(ctx, inputs, bound):
-        b = torch.ones(inputs.size(),device = inputs.device)*bound
-        b = b.to(inputs.device)
+        # 确保 b 在 inputs 的设备上
+        b = torch.ones(inputs.size(), device=inputs.device) * bound
         ctx.save_for_backward(inputs, b)
         return torch.max(inputs, b)
 
@@ -32,7 +27,6 @@ class GDN(nn.Module):
     """
     def __init__(self,
                 ch,
-                device=torch.device('cuda'),
                 inverse=False,
                 beta_min=1e-6,
                 gamma_init=.1,
@@ -41,53 +35,45 @@ class GDN(nn.Module):
         self.inverse = inverse
         self.beta_min = beta_min
         self.gamma_init = gamma_init
-        self.reparam_offset = torch.tensor([reparam_offset], device=device)
+        self.reparam_offset = nn.Parameter(torch.tensor([reparam_offset]))
 
-        self.build(ch, torch.device(device))
+        self.build(ch)
 
-    def build(self, ch, device):
-        self.pedestal = self.reparam_offset**2
-        self.beta_bound = (self.beta_min + self.reparam_offset**2)**.5
+    def build(self, ch):
+        self.pedestal = self.reparam_offset ** 2
+        self.beta_bound = (self.beta_min + self.reparam_offset ** 2) ** 0.5
         self.gamma_bound = self.reparam_offset
 
-        # Create beta param
-        beta = torch.sqrt(torch.ones(ch, device=device)+self.pedestal)
+        # 创建 beta 参数
+        beta = torch.sqrt(torch.ones(ch) + self.pedestal)
         self.beta = nn.Parameter(beta)
 
-        # Create gamma param
-        eye = torch.eye(ch, device=device)
-        g = self.gamma_init*eye
+        # 创建 gamma 参数
+        eye = torch.eye(ch)
+        g = self.gamma_init * eye
         g = g + self.pedestal
         gamma = torch.sqrt(g)
         self.gamma = nn.Parameter(gamma)
 
     def forward(self, inputs):
-        unfold = False
-        if inputs.dim() == 5:
-            unfold = True
-            bs, ch, d, w, h = inputs.size() 
-            inputs = inputs.view(bs, ch, d*w, h)
+        device = inputs.device  # 动态获取输入张量的设备
 
-        _, ch, _, _ = inputs.size()
+        # 确保所有相关的张量都在相同的设备上
+        beta = LowerBound.apply(self.beta, self.beta_bound).to(device)
+        beta = beta ** 2 - self.pedestal.to(device)
 
-        # Beta bound and reparam
-        beta = LowerBound.apply(self.beta, self.beta_bound)
-        beta = beta**2 - self.pedestal 
+        gamma = LowerBound.apply(self.gamma, self.gamma_bound).to(device)
+        gamma = gamma ** 2 - self.pedestal.to(device)
+        gamma = gamma.view(inputs.size(1), inputs.size(1), 1, 1).to(device)
 
-        # Gamma bound and reparam
-        gamma = LowerBound.apply(self.gamma, self.gamma_bound)
-        gamma = gamma**2 - self.pedestal
-        gamma  = gamma.view(ch, ch, 1, 1)
-
-        # Norm pool calc
-        norm_ = nn.functional.conv2d(inputs**2, gamma, beta)
+        # 归一化计算
+        norm_ = nn.functional.conv2d(inputs ** 2, gamma, beta)
         norm_ = torch.sqrt(norm_)
-        # Apply norm
+        
+        # 应用归一化
         if self.inverse:
             outputs = inputs * norm_
         else:
             outputs = inputs / norm_
 
-        if unfold:
-            outputs = outputs.view(bs, ch, d, w, h)
         return outputs
