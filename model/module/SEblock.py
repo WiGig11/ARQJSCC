@@ -46,7 +46,6 @@ class AFlayer(nn.Module):
         snr = torch.full((b, 1), snr)
         snr = snr.to(y.device)
         y = torch.cat([snr,y],1)
-        #pdb.set_trace()
         y = self.fc(y)
         y= y.view(b,c,1,1)
         y = x*y.expand_as(x)
