@@ -10,11 +10,12 @@ from torch.autograd import Function
 class LowerBound(Function):
     @staticmethod
     def forward(ctx, inputs, bound):
-        b = torch.ones(inputs.size(), device=inputs.device)*bound
+        #b = torch.ones(inputs.size(), device=inputs.device)*bound
+        b = torch.ones(inputs.size())*bound
         b = b.to(inputs.device)
         ctx.save_for_backward(inputs, b)
         return torch.max(inputs, b)
-  
+
     @staticmethod
     def backward(ctx, grad_output):
         inputs, b = ctx.saved_tensors
@@ -30,14 +31,13 @@ class GDN(nn.Module):
     """Generalized divisive normalization layer.
     y[i] = x[i] / sqrt(beta[i] + sum_j(gamma[j, i] * x[j]^2))
     """
-  
     def __init__(self,
-                 ch,
-                 device=torch.device('cuda'),
-                 inverse=False,
-                 beta_min=1e-6,
-                 gamma_init=.1,
-                 reparam_offset=2**-18):
+                ch,
+                device=torch.device('cuda'),
+                inverse=False,
+                beta_min=1e-6,
+                gamma_init=.1,
+                reparam_offset=2**-18):
         super(GDN, self).__init__()
         self.inverse = inverse
         self.beta_min = beta_min
@@ -45,7 +45,7 @@ class GDN(nn.Module):
         self.reparam_offset = torch.tensor([reparam_offset], device=device)
 
         self.build(ch, torch.device(device))
-  
+
     def build(self, ch, device):
         self.pedestal = self.reparam_offset**2
         self.beta_bound = (self.beta_min + self.reparam_offset**2)**.5
@@ -83,7 +83,6 @@ class GDN(nn.Module):
         # Norm pool calc
         norm_ = nn.functional.conv2d(inputs**2, gamma, beta)
         norm_ = torch.sqrt(norm_)
-  
         # Apply norm
         if self.inverse:
             outputs = inputs * norm_
