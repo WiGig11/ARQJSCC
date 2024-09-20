@@ -86,8 +86,8 @@ def train(hparams):
     output: training
     """
     # define the basic parts
-    encoder = Encoder(out_channels=16)# 512(8*8*8)
-    decoder = Decoder(in_channels=16)
+    encoder = Encoder(out_channels=hparams.out_channels)# 512(8*8*8)
+    decoder = Decoder(in_channels=hparams.in_channels)
     # determine whether to use the ckpt
     if 'awgn' in hparams.channel.lower():
         channel = AWGNChannel()
@@ -134,13 +134,17 @@ def train(hparams):
                                     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
     trainset = torchvision.datasets.CIFAR10(root='./cifar_data', train=True,download=True, transform=transform)
     valset = torchvision.datasets.CIFAR10(root='./cifar_data', train=False,download=True, transform=transform)
-    train_loader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,shuffle=True, num_workers=15,pin_memory = False)
-    val_loader = torch.utils.data.DataLoader(valset, batch_size=batch_size,shuffle=False, num_workers=15,pin_memory = False)
+    train_loader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,shuffle=True, num_workers=31,pin_memory = False)
+    val_loader = torch.utils.data.DataLoader(valset, batch_size=batch_size,shuffle=False, num_workers=31,pin_memory = False)
     # create logger instance
     if 'awgn' in hparams.channel.lower():
         logger = TensorBoardLogger("logs",name = "JSCC/AWGN")
+        if not os.path.exists('logs/JSCC/AWGN'):
+            os.makedirs('logs/JSCC/AWGN')
     else:
         logger = TensorBoardLogger("logs",name = "JSCC/RAYL")
+        if not os.path.exists('logs/JSCC/RAYL'):
+            os.makedirs('logs/JSCC/RAYL')
     # define call backs
     callbacks = [pl.callbacks.ModelCheckpoint(every_n_epochs=int(hparams.save_ckpt_every_n_epochs),save_top_k = 2,monitor="val_loss_G",mode="min"),
                 EarlyStopping(monitor = 'val_loss_G',min_delta=0.0005, patience=50)]
@@ -206,6 +210,8 @@ if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("--ckpt_addr", type = str,default='')
     parser.add_argument("--batch_size",type = int, default=16)
+    parser.add_argument("--in_channels",type = int, default=8)
+    parser.add_argument("--out_channels",type = int, default=8)
     parser.add_argument("--device",type = str, default=[1])
     parser.add_argument("--max_epoches", type = int, default=10)
     parser.add_argument("--plot_lr", type = str ,default=False)
