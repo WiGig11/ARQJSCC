@@ -34,7 +34,7 @@ import numpy as np
 import cv2
 import pdb
 import time
-from tqdm import tqdm
+import tqdm
 import os
 
 
@@ -183,8 +183,10 @@ def test_check(val_loader,device,repeattimes,model,dis_thre):
                     #4.discard the wrong images            
                     #traverse batch
                     preds_dis_trans= preds_trans
-                    for j in images.size[0]:
-                        if np.mean(decoder_classifcation[j]) < dis_thre:
+                    pdb.set_trace()
+                    for j in range(images.size()[0]):
+                        #pdb.set_trace()
+                        if torch.mean(decoder_classifcation[0][j]+decoder_classifcation[1][j]+decoder_classifcation[2][j]) < dis_thre:
                             pass
                         elif preds_dis_trans[j]==labels[j]:
                             correct_trans_dis = correct_trans_dis+1                           
@@ -430,3 +432,5 @@ if __name__ == "__main__":
     main(args)
 #python test.py --ckpt_addr 'ARQ/AWGN/version_0/checkpoints/epoch=499-step=782000.ckpt' --batch_size 64 --device 0 --channel 8 --communication_channel 'awgn' --hyperparameter 5 --name 'version_0' --addr 'res/awgn/'
 #python test.py --ckpt_addr 'ARQ/AWGN/version_0/checkpoints/epoch=499-step=782000.ckpt' --batch_size 64 --device 0 --channel 8 --communication_channel 'awgn' --hyperparameter 5 --name 'version_0' --addr 'res/rayl/'
+
+#python testcheck.py --ckpt_addr 'logs/RAYL/v2.ckpt' --batch_size 64 --device 0 --channel 8 --communication_channel 'rayl' --hyperparameter 5 --name 'version_0' --addr 'res/rayl/'
